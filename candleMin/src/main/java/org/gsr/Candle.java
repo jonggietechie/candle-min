@@ -1,5 +1,6 @@
 package org.gsr;
 
+import org.gsr.kafka.Producer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +14,11 @@ public class Candle {
     private double open, high, low, close;
     private int ticks;
     private long startTime;
+    private final Producer kafkaProducer;
 
-    public Candle (OrderBook orderBook) {
+    public Candle (OrderBook orderBook, Producer kafkaProducer) {
         this.orderBook = orderBook;
+        this.kafkaProducer = kafkaProducer;
     }
 
     public void start() {
@@ -62,6 +65,7 @@ public class Candle {
                 timestamp, open, high, low, close, ticks);
 
         LOGGER.info(candleData);
+        kafkaProducer.send(candleData);
 
         resetCandle();
         startTime = System.currentTimeMillis() /1000;
